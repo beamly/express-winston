@@ -125,6 +125,12 @@ function logger(options) {
     options.level = options.level || "info";
     options.msg = options.msg || "HTTP {{req.method}} {{req.url}}";
 
+    this.options = options;
+
+    this.add = function(transport, options) {
+      this.options.transports.push(new (transport)(options));
+    }
+
     return function (req, res, next) {
 
         req._startTime = (new Date);
@@ -139,6 +145,8 @@ function logger(options) {
         var end = res.end;
         res.end = function(chunk, encoding) {
             res.responseTime = (new Date) - req._startTime;
+
+            if(res.statusCode >= 500) options.level = "error";
 
             res.end = end;
             res.end(chunk, encoding);
@@ -190,6 +198,7 @@ function ensureValidOptions(options) {
 
 module.exports.errorLogger = errorLogger;
 module.exports.logger = logger;
+module.exports.logger.add = logger.add;
 module.exports.requestWhitelist = requestWhitelist;
 module.exports.bodyWhitelist = bodyWhitelist;
 module.exports.responseWhitelist = responseWhitelist;
