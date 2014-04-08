@@ -18,6 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+'use strict';
+
 var winston = require('winston');
 var util = require('util');
 var _ = require('underscore');
@@ -116,23 +119,17 @@ function errorLogger(options) {
 //
 
 
-function logger(options) {
+function logger(initialOptions) {
 
-    ensureValidOptions(options);
+    ensureValidOptions(initialOptions);
 
-    options.requestFilter = options.requestFilter || defaultRequestFilter;
-    options.responseFilter = options.responseFilter || defaultResponseFilter;
-    options.level = options.level || "info";
-    options.msg = options.msg || "HTTP {{req.method}} {{req.url}}";
-
-    this.options = options;
-
-    this.add = function(transport, options) {
-      this.options.transports.push(new (transport)(options));
-    }
+    initialOptions.requestFilter = initialOptions.requestFilter || defaultRequestFilter;
+    initialOptions.responseFilter = initialOptions.responseFilter || defaultResponseFilter;
+    initialOptions.level = initialOptions.level || "info";
+    initialOptions.msg = initialOptions.msg || "HTTP {{req.method}} {{req.url}}";
 
     return function (req, res, next) {
-        options = _.clone(options)
+        var options = _.clone(initialOptions);
 
         req._startTime = (new Date);
 
@@ -199,7 +196,6 @@ function ensureValidOptions(options) {
 
 module.exports.errorLogger = errorLogger;
 module.exports.logger = logger;
-module.exports.logger.add = logger.add;
 module.exports.requestWhitelist = requestWhitelist;
 module.exports.bodyWhitelist = bodyWhitelist;
 module.exports.responseWhitelist = responseWhitelist;
