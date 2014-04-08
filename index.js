@@ -18,6 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+'use strict';
+
 var winston = require('winston');
 var util = require('util');
 var chalk = require('chalk');
@@ -140,17 +143,12 @@ function errorLogger(options) {
 //
 
 
-function logger(options) {
+function logger(initialOptions) {
 
-    ensureValidOptions(options);
+    ensureValidOptions(initialOptions);
     ensureValidLoggerOptions(options);
-
-    options.requestFilter = options.requestFilter || defaultRequestFilter;
-    options.responseFilter = options.responseFilter || defaultResponseFilter;
     options.winstonInstance = options.winstonInstance || (new winston.Logger ({ transports: options.transports }));
-    options.level = options.level || "info";
     options.statusLevels = options.statusLevels || false;
-    options.msg = options.msg || "HTTP {{req.method}} {{req.url}}";
     options.colorStatus = options.colorStatus || false;
     options.expressFormat = options.expressFormat || false;
     options.ignoreRoute = options.ignoreRoute || function () { return false; };
@@ -161,11 +159,10 @@ function logger(options) {
       interpolate: /\{\{(.+?)\}\}/g
     });
 
-    this.options = options;
-
-    this.add = function(transport, options) {
-      this.options.transports.push(new (transport)(options));
-    }
+    initialOptions.requestFilter = initialOptions.requestFilter || defaultRequestFilter;
+    initialOptions.responseFilter = initialOptions.responseFilter || defaultResponseFilter;
+    initialOptions.level = initialOptions.level || "info";
+    initialOptions.msg = initialOptions.msg || "HTTP {{req.method}} {{req.url}}";
 
     return function (req, res, next) {
         var currentUrl = req.originalUrl || req.url;
@@ -279,7 +276,6 @@ function ensureValidLoggerOptions(options) {
 
 module.exports.errorLogger = errorLogger;
 module.exports.logger = logger;
-module.exports.logger.add = logger.add;
 module.exports.requestWhitelist = requestWhitelist;
 module.exports.bodyWhitelist = bodyWhitelist;
 module.exports.bodyBlacklist = bodyBlacklist;
