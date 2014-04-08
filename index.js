@@ -132,6 +132,7 @@ function logger(options) {
     }
 
     return function (req, res, next) {
+        options = _.clone(options)
 
         req._startTime = (new Date);
 
