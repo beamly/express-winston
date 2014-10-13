@@ -243,6 +243,8 @@ function logger(initialOptions) {
               if (filteredBody) meta.req.body = filteredBody;
 
               meta.responseTime = res.responseTime;
+            } else if(typeof(options.meta) === 'function') {
+              meta = options.meta(req, res);
             }
 
             if(options.expressFormat) {
