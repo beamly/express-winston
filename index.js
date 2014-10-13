@@ -149,8 +149,9 @@ function logger(initialOptions) {
             res.end = end;
             res.end(chunk, encoding);
 
-            if(options.meta !== false) {
-              var meta = {};
+            var meta;
+            if(options.meta === true) {
+              meta = {};
 
               var bodyWhitelist;
 
@@ -167,6 +168,8 @@ function logger(initialOptions) {
               };
 
               meta.responseTime = res.responseTime;
+            } else if(typeof(options.meta) === 'function') {
+              meta = options.meta(req, res);
             }
 
             // Using mustache style templating
