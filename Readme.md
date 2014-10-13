@@ -49,7 +49,7 @@ Use `expressWinston.logger(options)` to create a middleware to log your HTTP req
           colorize: true
         })
       ],
-      meta: true, // optional: control whether you want to log the meta data about the request (default to true)
+      meta: true, // optional: control whether you want to log the meta data about the request (default to true). Can also pass function(req, res) which returns an object containing metadata fields to log.
       msg: "HTTP {{req.method}} {{req.url}}" // optional: customize the default logging message. E.g. "{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}"
     }));
     app.use(app.router); // notice how the router goes after the logger.
