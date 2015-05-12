@@ -143,12 +143,17 @@ function errorLogger(options) {
 //
 
 
-function logger(initialOptions) {
+function logger(options) {
 
-    ensureValidOptions(initialOptions);
+    ensureValidOptions(options);
     ensureValidLoggerOptions(options);
+
+    options.requestFilter = options.requestFilter || defaultRequestFilter;
+    options.responseFilter = options.responseFilter || defaultResponseFilter;
     options.winstonInstance = options.winstonInstance || (new winston.Logger ({ transports: options.transports }));
+    options.level = options.level || "info";
     options.statusLevels = options.statusLevels || false;
+    options.msg = options.msg || "HTTP {{req.method}} {{req.url}}";
     options.colorStatus = options.colorStatus || false;
     options.expressFormat = options.expressFormat || false;
     options.ignoreRoute = options.ignoreRoute || function () { return false; };
@@ -158,11 +163,6 @@ function logger(initialOptions) {
     var template = _.template(options.msg, null, {
       interpolate: /\{\{(.+?)\}\}/g
     });
-
-    initialOptions.requestFilter = initialOptions.requestFilter || defaultRequestFilter;
-    initialOptions.responseFilter = initialOptions.responseFilter || defaultResponseFilter;
-    initialOptions.level = initialOptions.level || "info";
-    initialOptions.msg = initialOptions.msg || "HTTP {{req.method}} {{req.url}}";
 
     return function (req, res, next) {
         var currentUrl = req.originalUrl || req.url;
