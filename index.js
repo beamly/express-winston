@@ -210,7 +210,9 @@ function logger(options) {
 
             var meta = {};
 
-            if(options.meta !== false) {
+            if(typeof(options.meta) === 'function') {
+              meta = options.meta(req, res);
+            } else if(options.meta !== false) {
               var bodyWhitelist, blacklist;
 
               requestWhitelist = requestWhitelist.concat(req._routeWhitelists.req || []);
@@ -243,8 +245,6 @@ function logger(options) {
               if (filteredBody) meta.req.body = filteredBody;
 
               meta.responseTime = res.responseTime;
-            } else if(typeof(options.meta) === 'function') {
-              meta = options.meta(req, res);
             }
 
             if(options.expressFormat) {
